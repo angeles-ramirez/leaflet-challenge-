@@ -1,8 +1,21 @@
-var bigE = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson"
+// API Key
+var API_KEY = "pk.eyJ1IjoiYW5nZWxlcy1yYW1pcmV6IiwiYSI6ImNrMnA5djJ1ejAyMmwzam15c3lzNWlyYm8ifQ.CJTodrXBHX3ISYAMtWvSEQ"
+
+// Create the tile layer that will be the background of our map
+var lightmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"http://mapbox.com\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.light",
+    accessToken: API_KEY
+});
+
+
+// Json Link for Big Earthquakes
+var bigE = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
 
 
 
-// get req to query url
+// get reqest to query url
 d3.json(bigE, function (data) {
     addFeatures(data.features);
 });
@@ -44,9 +57,12 @@ function addFeatures(bigEdata) {
 function createMap(earthquakes) {
 
     // Define streetmap and darkmap layers
-    var streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/outdoors-v10/tiles/256/{z}/{x}/{y}?" +
-        "access_token=pk.eyJ1Ijoia2pnMzEwIiwiYSI6ImNpdGRjbWhxdjAwNG0yb3A5b21jOXluZTUifQ." +
-        "T6YbdDixkOBWH_k9GbS8JQ");
+    var streetmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+        attribution: "Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors, <a href='https://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery © <a href='https://www.mapbox.com/'>Mapbox</a>",
+        maxZoom: 18,
+        id: "mapbox.light",
+        accessToken: API_KEY
+    });
     // Define a baseMaps object to hold our base layers
     var baseMaps = {
         "Street Map": streetmap
@@ -65,6 +81,10 @@ function createMap(earthquakes) {
         zoom: 5,
         layers: [streetmap, earthquakes]
     });
+
+    L.control.layers(baseMaps, overlayMaps, {
+        collapsed: false
+    }).addTo(myMap);
 
 
     function getColor(d) {
